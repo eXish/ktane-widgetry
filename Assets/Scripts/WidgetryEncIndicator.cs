@@ -41,12 +41,13 @@ public class WidgetryEncIndicator : WidgetryIndicator
             selections.Remove(selection);
         }
 
-        if(total < 0 || total >= 11)
+        if(total < 1 || total > 11)
             goto tryagain;
 
-        _ind = (Indicator)total;
+        _ind = (Indicator)total-1;
         string[] labels = new string[] { "CLR", "IND", "TRN", "FRK", "CAR", "FRQ", "NSA", "SIG", "MSA", "SND", "BOB" };
         _state = Random.Range(0, 2) == 1;
+        _bulb.sharedMaterial = _state ? _onMat : _offMat;
 
         Log("There is an " + (_state ? "" : "un") + "lit encrypted " + _ind + " indicator. (" + _label.text + ")");
     }

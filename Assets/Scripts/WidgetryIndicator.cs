@@ -5,9 +5,9 @@ public class WidgetryIndicator : WidgetryWidget
     [SerializeField]
     protected TextMesh _label;
     [SerializeField]
-    private Renderer _bulb;
+    protected Renderer _bulb;
     [SerializeField]
-    private Material _onMat, _offMat;
+    protected Material _onMat, _offMat;
 
     protected Indicator _ind;
     protected bool _state;

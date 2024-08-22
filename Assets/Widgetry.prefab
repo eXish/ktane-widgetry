@@ -174,7 +174,6 @@ GameObject:
   - component: {fileID: 4129417499332872}
   - component: {fileID: 33940886591888214}
   - component: {fileID: 23356598458114068}
-  - component: {fileID: 114885175704362506}
   m_Layer: 0
   m_Name: Metal
   m_TagString: Untagged
@@ -1715,7 +1714,6 @@ GameObject:
   - component: {fileID: 4382056823798322}
   - component: {fileID: 33454779585700940}
   - component: {fileID: 23565169661371870}
-  - component: {fileID: 114869193950646904}
   m_Layer: 0
   m_Name: Nub
   m_TagString: Untagged
@@ -9842,30 +9840,6 @@ MonoBehaviour:
   m_Script: {fileID: -381104716, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114869193950646904
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1737969729671474}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17ca06cc519b2a241a3120c4adf7d653, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _count: 1
---- !u!114 &114885175704362506
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1051637217934984}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17ca06cc519b2a241a3120c4adf7d653, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _count: 1
 --- !u!114 &114912208640729778
 MonoBehaviour:
   m_ObjectHideFlags: 1
