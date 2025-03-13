@@ -5,6 +5,14 @@ using UnityEngine;
 
 public class WidgetryPortPlate : WidgetryWidget
 {
+    public override string Id
+    {
+        get
+        {
+            return "PortPlate";
+        }
+    }
+
     [SerializeField]
     private PortType[] _ports;
 

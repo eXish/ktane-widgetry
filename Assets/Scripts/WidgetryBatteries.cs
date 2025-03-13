@@ -1,11 +1,16 @@
-﻿using KModkit;
-using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class WidgetryBatteries : WidgetryWidget
 {
     [SerializeField]
     private int _count;
+    public override string Id
+    {
+        get
+        {
+            return "BatteryHolder";
+        }
+    }
 
     public void Start()
     {

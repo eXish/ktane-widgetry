@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using UnityEngine;
+using wawa.DDL;
 
 #if !UNITY_EDITOR
 using System.Reflection;
@@ -21,10 +22,7 @@ public class WidgetryScript : MonoBehaviour
     private int _id;
 
     [SerializeField]
-    private Widgetry2FA _2fa;
-
-    [SerializeField]
-    private WidgetryWidget[] _vanillaWidgets, _moddedWidgets;
+    private GameObject[] _slots;
 
     [SerializeField]
     private KMBombInfo _info;
@@ -53,9 +51,9 @@ public class WidgetryScript : MonoBehaviour
 
         _destroy += () => {  _widgets[_key] = new List<WidgetQuery>(); };
 #else  
-        if(!_widgets.ContainsKey(_key))
+        if (!_widgets.ContainsKey(_key))
             _widgets.Add(_key, new List<WidgetQuery>());
-        foreach(WidgetQuery q in GenerateWidgets())
+        foreach (WidgetQuery q in GenerateWidgets())
             _widgets[_key].Add(q);
 #endif
 
@@ -98,10 +96,10 @@ public class WidgetryScript : MonoBehaviour
         _buttonWhatsit.AddInteractionPunch(1f);
         GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, _buttonWhatsit.transform);
 
-        if(_solved)
+        if (_solved)
             return;
 
-        if(GetComponentsInChildren<WidgetryIndicator>().Length > 0)
+        if (GetComponentsInChildren<WidgetryIndicator>().Length > 0)
             Solve();
         else
             Strike();
@@ -112,10 +110,10 @@ public class WidgetryScript : MonoBehaviour
         _buttonDoodad.AddInteractionPunch(1f);
         GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, _buttonDoodad.transform);
 
-        if(_solved)
+        if (_solved)
             return;
 
-        if(GetComponentsInChildren<WidgetryIndicator>().Length == 0)
+        if (GetComponentsInChildren<WidgetryIndicator>().Length == 0)
             Solve();
         else
             Strike();
@@ -135,36 +133,92 @@ public class WidgetryScript : MonoBehaviour
 
     private void OnDestroy()
     {
-        if(_destroy != null)
+        if (_destroy != null)
             _destroy();
+        if (_configNext.Count != 0)
+        {
+            ComponentLog("There were extra configurations in the mission's settings.");
+            _configNext.Clear();
+        }
+        _inMission = false;
     }
 
+    private static bool _inMission;
+    private static readonly Queue<string[][]> _configNext = new Queue<string[][]>();
     private IEnumerable<WidgetQuery> GenerateWidgets()
     {
-        yield return _2fa.GetQuery();
-        WidgetryWidget van = _vanillaWidgets.PickRandom();
-        //WidgetryWidget van = _vanillaWidgets[3];
-        foreach(WidgetryWidget w in _vanillaWidgets)
-            w.gameObject.SetActive(false);
-        van.gameObject.SetActive(true);
-        yield return van.GetQuery();
-        WidgetryWidget mod = _moddedWidgets.PickRandom();
-        foreach(WidgetryWidget w in _moddedWidgets)
-            w.gameObject.SetActive(false);
-        mod.gameObject.SetActive(true);
-        yield return mod.GetQuery();
+    mission:
+        if (_inMission && _configNext.Count > 0)
+        {
+            ComponentLog("Using the mission's settings.");
+            return GenerateWidgets(_configNext.Dequeue());
+        }
+
+        // One Widgetry specifier applies to one Widgetry module, with extra modules using the default settings.
+        // Example:
+        // [Widgetry] [Indicator, Indicator, Indicator, VoltageMeter] [TwoFactor, ModdedPortPlate, PortPlate, EncryptedIndicator] [BatteryHolder]
+        // [Widgetry] [TwoFactor, BatteryHolder, EncryptedIndicator, Indicator, ModdedPortPlate, PortPlate, VoltageMeter] [TwoFactor, BatteryHolder, EncryptedIndicator, Indicator, ModdedPortPlate, PortPlate, VoltageMeter] [TwoFactor, BatteryHolder, EncryptedIndicator, Indicator, ModdedPortPlate, PortPlate, VoltageMeter]
+        if (!_inMission && Missions.Description.IsSome)
+        {
+            var desc = Missions.Description.Value;
+            var lines = desc.Split('\n').Where(l => Regex.IsMatch(l, @"^\s*\[Widgetry\]")).ToArray();
+            if (lines.Length == 0)
+                goto standard;
+            var ids = "(?:TwoFactor|BatteryHolder|(?:Encrypted)?Indicator|(?:Modded)?PortPlate|VoltageMeter)";
+            var matches = lines.Select(l => Regex.Match(l, @"^\s*\[Widgetry\]((?:\s+\[" + ids + @"(?:,\s+" + ids + @")*\s*\]){3})\s*$")).ToArray();
+            if (matches.Any(m => !m.Success))
+            {
+                ComponentLog("The mission description has a section for Widgetry, but it isn't valid.");
+                goto standard;
+            }
+            foreach (var m in matches)
+            {
+                var line = Regex.Replace(m.Groups[1].Value, "\\s", "");
+                line = line.Substring(1, line.Length - 2);
+                var slots = line.Split(new[] { "][" }, StringSplitOptions.None);
+                var config = slots.Select(sl => sl.Split(',')).ToArray();
+                _configNext.Enqueue(config);
+            }
+            _inMission = true;
+            goto mission;
+        }
+
+    standard:
+        ComponentLog("Using the default settings.");
+        return GenerateWidgets(
+            new[] { "TwoFactor" },
+            new[] { "EncryptedIndicator", "ModdedPortPlate", "VoltageMeter" },
+            new[] { "BatteryHolder", "PortPlate", "Indicator" });
+    }
+    private IEnumerable<WidgetQuery> GenerateWidgets(params string[][] config)
+    {
+        if (config.Length != 3)
+            throw new ArgumentException("Expected config for 3 slots, got " + config.Length);
+        ComponentLog("Widget A can be: " + config[0].Join(", "));
+        ComponentLog("Widget B can be: " + config[1].Join(", "));
+        ComponentLog("Widget C can be: " + config[2].Join(", "));
+        var ids = config.Select(a => a.PickRandom()).ToArray();
+        for (int i = 0; i < 3; i++)
+        {
+            var children = _slots[i].GetComponentsInChildren<WidgetryWidget>(true);
+            foreach (var ch in children)
+                ch.gameObject.SetActive(false);
+            var widget = children.Where(w => w.Id == ids[i]).PickRandom();
+            widget.gameObject.SetActive(true);
+            yield return widget.GetQuery();
+        }
     }
 
     private static List<string> QueryPostfix(List<string> output, string queryKey, string queryInfo/*, object __instance*/)
     {
-        if(_widgets.ContainsKey(_key))
+        if (_widgets.ContainsKey(_key))
             output.AddRange(_widgets[_key].Select(f => f(queryKey, queryInfo)).Where(s => s != null && !s.Equals(string.Empty)));
         return output;
     }
 
     private static List<string> MBQueryPostfix(List<string> output, object bomb, string queryKey, string queryInfo/*, object __instance*/)
     {
-        if(_widgets.ContainsKey(_key))
+        if (_widgets.ContainsKey(_key))
             output.AddRange(_widgets[_key].Select(f => f(queryKey, queryInfo)).Where(s => s != null && !s.Equals(string.Empty)));
         return output;
     }
@@ -179,12 +233,12 @@ public class WidgetryScript : MonoBehaviour
 #pragma warning restore 414
     private IEnumerator ProcessTwitchCommand(string command)
     {
-        if(Regex.IsMatch(command.ToLowerInvariant(), @"\s*w\s*"))
+        if (Regex.IsMatch(command.ToLowerInvariant(), @"\s*w\s*"))
         {
             yield return null;
             _buttonWhatsit.OnInteract();
         }
-        else if(Regex.IsMatch(command.ToLowerInvariant(), @"\s*d\s*"))
+        else if (Regex.IsMatch(command.ToLowerInvariant(), @"\s*d\s*"))
         {
             yield return null;
             _buttonDoodad.OnInteract();
@@ -193,7 +247,7 @@ public class WidgetryScript : MonoBehaviour
 
     private IEnumerator TwitchHandleForcedSolve()
     {
-        if(GetComponentsInChildren<WidgetryIndicator>().Length == 0)
+        if (GetComponentsInChildren<WidgetryIndicator>().Length == 0)
             _buttonDoodad.OnInteract();
         else
             _buttonWhatsit.OnInteract();

@@ -1,11 +1,17 @@
-﻿using KModkit;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class WidgetryEncIndicator : WidgetryIndicator
 {
+    public override string Id
+    {
+        get
+        {
+            return "EncryptedIndicator";
+        }
+    }
+
     private static readonly char[] chars = "ใɮʖฬนÞฏѨԈԒดลЖ".ToCharArray();
     private static readonly Dictionary<char, int[]> values = new Dictionary<char, int[]>()
     {
