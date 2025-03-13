@@ -6,6 +6,14 @@ using System;
 
 public class WidgetryVoltageMeter : WidgetryWidget
 {
+    public override string Id
+    {
+        get
+        {
+            return "VoltageMeter";
+        }
+    }
+
     public GameObject squareModel;
     public GameObject circleModel;
     public GameObject pointer;

@@ -17,6 +17,14 @@ public class Widgetry2FA : WidgetryWidget
 
     private float _timeStarted;
 
+    public override string Id
+    {
+        get
+        {
+            return "TwoFactor";
+        }
+    }
+
     public int Key { get; private set; }
 
     private void Start()

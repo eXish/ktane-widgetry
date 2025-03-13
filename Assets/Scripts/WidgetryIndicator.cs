@@ -2,6 +2,14 @@
 
 public class WidgetryIndicator : WidgetryWidget
 {
+    public override string Id
+    {
+        get
+        {
+            return "Indicator";
+        }
+    }
+
     [SerializeField]
     protected TextMesh _label;
     [SerializeField]
