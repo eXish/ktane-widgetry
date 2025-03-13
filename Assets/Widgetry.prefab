@@ -9379,7 +9379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _text: {fileID: 102604862733712582}
   _timer: {fileID: 102439732130957164}
-  _changeTime: 45
+  _changeTime: 60
   _clip: {fileID: 8300000, guid: 65d1e99a18ab44b4585c9e788beff005, type: 3}
   _audio: {fileID: 114174358250273416}
 --- !u!114 &114420727257419826
