@@ -16,8 +16,17 @@ MonoBehaviour:
   author: eXish
   description: "Determine whether the module is a Whatsit or a Doodad. This module
     will generate extra edgework for the entire bomb, and in order to do this requires
-    the Tweaks mod.\n\r\nHTML: https://ktane.timwi.de/HTML/Widgetry.html\r\nPDF: https://ktane.timwi.de/PDF/Widgetry.pdf\r\n\r\nWidgetry
-    (widgetry) v1.3\nModule by Anonymous, maintained by eXish\r\nTwitch Plays supported"
+    the Tweaks mod.\n\nDear mission makers, if you wish to configure your mission
+    to customize which widget types can appear in each slot then put [Widgetry] [A]
+    [B] [C] in your mission description and replace A, B, and C with the widget types
+    you want to appear on those slots. Note that this will only affect 1 Widgetry
+    module. If you have multiple Widgetry modules you want to customize you must put
+    this line in the description that many times. If you do not all extra Widgetry
+    modules will generate normally. Here's the normal Widgetry generation as an example:\n[Widgetry]
+    [TwoFactor] [EncryptedIndicator, ModdedPortPlate, VoltageMeter] [BatteryHolder,
+    PortPlate, Indicator]\n\r\nHTML: https://ktane.timwi.de/HTML/Widgetry.html\r\nPDF:
+    https://ktane.timwi.de/PDF/Widgetry.pdf\r\n\r\nWidgetry (widgetry) v1.3\nModule
+    by Anonymous, maintained by eXish\r\nTwitch Plays supported"
   version: 1.3
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 6905cb9e63a8caf4d8195a48d43bd3ac, type: 3}
